@@ -2,8 +2,6 @@
 
 A CLI tool to manage multiple PHP versions in XAMPP on Windows.
 
-[![GitHub](https://img.shields.io/github/license/pphatdev/php-version-switcher)](https://github.com/pphatdev/php-version-switcher)
-
 ## Setup
 
 1. Clone or download from [GitHub](https://github.com/pphatdev/php-version-switcher):
