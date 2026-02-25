@@ -26,8 +26,10 @@ jobs:
       - name: Build MSI
         shell: pwsh
         run: |
-          $version = "${{ github.event.release.tag_name }}".TrimStart('v')
-          Write-Host "Building with version: $version"
+          $tagVersion = "${{ github.event.release.tag_name }}".TrimStart('v')
+          # Strip pre-release suffix (e.g., 1.1.1-beta -> 1.1.1)
+          $version = $tagVersion -replace '-.*$', ''
+          Write-Host "Tag: $tagVersion -> MSI Version: $version"
           dotnet build ./installer/Phat.wixproj -c Release -p:ProductVersion=$version
 
       - name: Debug - List built files
