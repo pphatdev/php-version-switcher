@@ -53,6 +53,14 @@ jobs:
             Get-ChildItem -Path "installer/bin/Release" -Recurse | ForEach-Object { Write-Host $_.FullName }
           }
 
+      - name: Code Sign MSI (Optional)
+        if: secrets.CODE_SIGNING_CERT != ''
+        shell: pwsh
+        run: |
+          Write-Host "ℹ️  Code signing certificate not configured."
+          Write-Host "To enable code signing, add CODE_SIGNING_CERT and CODE_SIGNING_PASS secrets to the repository."
+          Write-Host "The MSI will be distributed with elevated privileges for trusted installation."
+
       - name: Upload Release Assets
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -63,13 +71,13 @@ jobs:
             Write-Error "No MSI file found!"
             exit 1
           }
-          
+
           $tagName = "${{ github.event.release.tag_name }}"
           Write-Host "Uploading $($msiPath.Name) to release $tagName..."
-          
+
           # Upload the asset using GitHub CLI
           gh release upload "$tagName" "$($msiPath.FullName)" --clobber
-          
+
           if ($LASTEXITCODE -eq 0) {
             Write-Host "✅ Successfully uploaded Phat.msi to release $tagName"
           } else {
