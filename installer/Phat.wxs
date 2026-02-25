@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Package
+        Name="Phat - XAMPP PHP Version Switcher"
+        Manufacturer="pphatdev"
+        Version="$(var.ProductVersion)"
+        UpgradeCode="{3B4F2B7E-3A1C-4B24-9A88-7CF4E7C2C941}">
+        <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+        <MediaTemplate />
+
+        <StandardDirectory Id="ProgramFilesFolder">
+            <Directory Id="INSTALLFOLDER" Name="Phat">
+                <Component Id="PhatBatComponent" Guid="*">
+                    <File Id="PhatBat" Source="..\phat.bat" KeyPath="yes" />
+                    <Environment
+                        Id="PhatPath"
+                        Name="Path"
+                        Value="[INSTALLFOLDER]"
+                        Action="set"
+                        Part="last"
+                        System="yes" />
+                </Component>
+                <Component Id="PhatPs1Component" Guid="*">
+                    <File Id="PhatPs1" Source="..\phat.ps1" KeyPath="yes" />
+                </Component>
+                <Component Id="ReadmeComponent" Guid="*">
+                    <File Id="Readme" Source="..\README.md" KeyPath="yes" />
+                </Component>
+            </Directory>
+        </StandardDirectory>
+
+        <StandardDirectory Id="ProgramMenuFolder">
+            <Directory Id="ApplicationProgramsFolder" Name="Phat">
+                <Component Id="StartMenuShortcut" Guid="*">
+                    <Shortcut
+                        Id="PhatShortcut"
+                        Name="Phat CLI"
+                        Description="Phat - XAMPP PHP Version Switcher"
+                        Target="[INSTALLFOLDER]phat.bat"
+                        WorkingDirectory="INSTALLFOLDER" />
+                    <RemoveFolder Id="ApplicationProgramsFolder" On="uninstall" />
+                    <RegistryValue
+                        Root="HKCU"
+                        Key="Software\pphatdev\Phat"
+                        Name="installed"
+                        Type="integer"
+                        Value="1"
+                        KeyPath="yes" />
+                </Component>
+            </Directory>
+        </StandardDirectory>
+
+        <Feature Id="MainFeature" Title="Phat" Level="1">
+            <ComponentRef Id="PhatBatComponent" />
+            <ComponentRef Id="PhatPs1Component" />
+            <ComponentRef Id="ReadmeComponent" />
+            <ComponentRef Id="StartMenuShortcut" />
+        </Feature>
+    </Package>
+</Wix>

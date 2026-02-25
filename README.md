@@ -95,6 +95,17 @@ php-version-switcher/
 - Windows 10/11
 - XAMPP installed at `C:\xampp`
 - PowerShell 5.1+
+- .NET SDK 6.0+ (for MSI builds)
+
+## Build MSI (dotnet)
+
+From PowerShell:
+
+```powershell
+dotnet build .\installer\Phat.wixproj -c Release -p:ProductVersion=1.0.0
+```
+
+The MSI will be created in `installer\bin\Release`.
 
 ## Notes
 

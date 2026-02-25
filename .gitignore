@@ -1,0 +1,31 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+.vs/
+.vscode/
+
+# Build outputs
+bin/
+obj/
+artifacts/
+
+# WiX
+installer/bin/
+installer/obj/
+installer/out/
+*.wixobj
+*.wixpdb
+*.msi
+*.cab
+
+# Logs
+*.log
+
+# Dotnet tools
+.dotnet/tools/
+
+# Temporary
+*.tmp
+*.bak
