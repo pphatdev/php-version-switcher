@@ -14,7 +14,7 @@ param(
 )
 
 # Configuration
-$PHAT_VERSION = "1.0.0"
+$PHAT_VERSION = "1.2.0"
 $XAMPP_ROOT  = "C:\xampp"
 $APACHE_CONF = "$XAMPP_ROOT\apache\conf\extra\httpd-xampp.conf"
 $APACHE_BIN  = "$XAMPP_ROOT\apache\bin\httpd.exe"
