@@ -4,7 +4,7 @@ A CLI tool to manage multiple PHP versions in XAMPP on Windows.
 
 ## Setup
 
-1. Clone or download from [GitHub](https://github.com/pphatdev/php-version-switcher):
+1. Clone or download from [GitHub](https://github.com/pphatdev/php-version-switcher/archive/refs/tags/v1.0.0.zip):
 
    ```bash
    git clone https://github.com/pphatdev/php-version-switcher.git
@@ -104,3 +104,4 @@ php-version-switcher/
 ## License
 
 MIT © [pphatdev](https://github.com/pphatdev)
+
