@@ -6,8 +6,6 @@
         Version="$(var.ProductVersion)"
         UpgradeCode="{3B4F2B7E-3A1C-4B24-9A88-7CF4E7C2C941}"
         Scope="perMachine">
-        <Summary>Phat - XAMPP PHP Version Switcher for Windows | pphat.top</Summary>
-        <Description>A lightweight CLI tool for managing multiple PHP versions in XAMPP on Windows. Publisher: PPhatDEV (pphat.top)</Description>
         <Icon Id="PhatIcon" SourceFile="assets\phat.ico" />
         <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
         <MediaTemplate EmbedCab="yes" />
