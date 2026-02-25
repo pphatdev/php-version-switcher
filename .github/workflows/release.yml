@@ -1,9 +1,8 @@
 name: Release
 
 on:
-  push:
-    tags:
-      - "v*.*.*"
+  release:
+    types: [published]
 
 permissions:
   contents: write
@@ -27,7 +26,7 @@ jobs:
       - name: Build MSI
         shell: pwsh
         run: |
-          $version = "${env:GITHUB_REF_NAME}".TrimStart('v')
+          $version = "${{ github.event.release.tag_name }}".TrimStart('v')
           dotnet build ./installer/Phat.wixproj -c Release -p:ProductVersion=$version
 
       - name: Create Release
