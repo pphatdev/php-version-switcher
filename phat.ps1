@@ -6,7 +6,11 @@ param(
     [string]$Argument,
 
     [Alias("v", "version")]
-    [switch]$VersionFlag
+    [switch]$VersionFlag,
+
+    [switch]$Php,
+    [switch]$Local,
+    [switch]$Global
 )
 
 # Configuration
@@ -165,21 +169,96 @@ function Show-Help {
     Write-Host "  Github: @pphatdev" -ForegroundColor Gray
     Write-Host ""
     Write-Host "  Usage:"
-    Write-UsageLine "phat list" "               -> List installed PHP versions"
-    Write-UsageLine "phat current" "            -> Show current PHP version"
-    Write-UsageLine "phat -v | --version" "     -> Show Phat version"
-    Write-UsageLine "phat switch [version]" "   -> Switch to a PHP version"
-    Write-UsageLine "phat use [version]" "      -> Alias for switch"
-    Write-UsageLine "phat install [version]" "  -> Download and install a PHP version"
-    Write-UsageLine "phat help" "               -> Show this help"
+    Write-UsageLine "phat list" "                      -> List installed PHP versions"
+    Write-UsageLine "phat list --php --local" "        -> List local PHP versions (same as list)"
+    Write-UsageLine "phat list --php --global" "       -> List available stable versions from PHP.net"
+    Write-UsageLine "phat current" "                   -> Show current PHP version"
+    Write-UsageLine "phat -v | --version" "            -> Show Phat version"
+    Write-UsageLine "phat switch [version]" "          -> Switch to a PHP version"
+    Write-UsageLine "phat use [version]" "             -> Alias for switch"
+    Write-UsageLine "phat install [version]" "         -> Download and install a PHP version"
+    Write-UsageLine "phat help" "                      -> Show this help"
     Write-Host ""
     Write-Host "  Examples:"
+    Write-ExampleLine "phat list --php --global"
     Write-ExampleLine "phat switch 7.4.33"
     Write-ExampleLine "phat install 8.2.27"
     Write-Host ""
 }
 
+function Get-GlobalPhpVersions {
+    try {
+        Write-Host "  Fetching available PHP versions from windows.php.net..." -ForegroundColor Gray
+        Write-Host ""
+        
+        $url = "https://windows.php.net/downloads/releases/"
+        $response = Invoke-WebRequest -Uri $url -UseBasicParsing -ErrorAction Stop
+        
+        # Parse available versions from the releases page
+        $versions = @()
+        $pattern = 'php-(\d+\.\d+\.\d+)-Win32-vs\d+-x64\.zip'
+        
+        $matches = [regex]::Matches($response.Content, $pattern)
+        foreach ($match in $matches) {
+            $version = $match.Groups[1].Value
+            if ($version -notin $versions) {
+                $versions += $version
+            }
+        }
+        
+        # Sort versions
+        $sortedVersions = $versions | Sort-Object {
+            $parts = $_ -split '\.'
+            [int]$parts[0] * 1000000 + [int]$parts[1] * 1000 + [int]$parts[2]
+        } -Descending
+        
+        if ($sortedVersions.Count -eq 0) {
+            Write-Host "  No versions found. Please check your internet connection." -ForegroundColor Yellow
+            return
+        }
+        
+        Write-Host "  Available stable PHP versions (Thread-Safe x64):" -ForegroundColor Cyan
+        
+        # Group by major.minor version
+        $grouped = @{}
+        foreach ($ver in $sortedVersions) {
+            $majorMinor = ($ver -split '\.')[0,1] -join '.'
+            if (-not $grouped.ContainsKey($majorMinor)) {
+                $grouped[$majorMinor] = @()
+            }
+            $grouped[$majorMinor] += $ver
+        }
+        
+        # Display grouped versions
+        foreach ($key in ($grouped.Keys | Sort-Object -Descending)) {
+            Write-Host ""
+            Write-Host "  PHP ${key}:" -ForegroundColor Yellow
+            foreach ($ver in $grouped[$key]) {
+                Write-Host "    $ver" -ForegroundColor White
+            }
+        }
+        
+        Write-Host ""
+        Write-Host "  To install a version: " -NoNewline -ForegroundColor Gray
+        Write-Host "phat install <version>" -ForegroundColor Cyan
+        Write-Host ""
+    }
+    catch {
+        Write-Host ""
+        Write-Host "  Error: Failed to fetch PHP versions from website." -ForegroundColor Red
+        Write-Host "  $_" -ForegroundColor Red
+        Write-Host ""
+    }
+}
+
 function Invoke-List {
+    # Handle --php --global flag
+    if ($Global -and $Php) {
+        Get-GlobalPhpVersions
+        return
+    }
+    
+    # Handle --php --local flag or default behavior
     Write-Host ""
     Write-Host "  Installed PHP versions:" -ForegroundColor Cyan
 

@@ -6,7 +6,8 @@ A simple yet powerful CLI tool to manage multiple PHP versions in XAMPP on Windo
 
 - 🔄 Switch between PHP versions instantly
 - 📦 Download and install new PHP versions automatically
-- 📋 List all installed PHP versions
+- 📋 List all installed PHP versions (local)
+- 🌐 Fetch available stable PHP versions from PHP.net (global)
 - ⚡ Automatic Apache configuration updates
 - 🛡️ Safe backups before switching
 
@@ -51,6 +52,8 @@ Displays the current Phat version.
 
 ```bash
 phat list
+# or explicitly list local versions
+phat list --php --local
 ```
 
 Output example:
@@ -60,6 +63,37 @@ Output example:
   * 7.4.33 (active, php7)
     8.0.30 (8.0.30)
     8.2.27 (8.2.27)
+```
+
+### List available PHP versions globally
+
+```bash
+phat list --php --global
+```
+
+This fetches the latest stable PHP versions available from [windows.php.net](https://windows.php.net/downloads/releases/) (Thread-Safe x64 builds).
+
+Output example:
+
+```
+  Fetching available PHP versions from windows.php.net...
+
+  Available stable PHP versions (Thread-Safe x64):
+
+  PHP 8.3:
+    8.3.15
+    8.3.14
+    8.3.13
+
+  PHP 8.2:
+    8.2.27
+    8.2.26
+
+  PHP 8.1:
+    8.1.31
+    8.1.30
+
+  To install a version: phat install <version>
 ```
 
 ### Show current version
