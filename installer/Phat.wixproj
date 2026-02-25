@@ -4,6 +4,9 @@
     <OutputName>Phat</OutputName>
     <ProductVersion Condition="'$(ProductVersion)' == ''">1.0.0</ProductVersion>
     <DefineConstants>ProductVersion=$(ProductVersion)</DefineConstants>
+    <!-- Security and Trust Settings -->
+    <InstallerVersion>500</InstallerVersion>
+    <Cultures>en-us</Cultures>
   </PropertyGroup>
 
 </Project>
