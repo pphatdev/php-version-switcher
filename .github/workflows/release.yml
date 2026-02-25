@@ -54,17 +54,34 @@ jobs:
           }
 
       - name: Upload Release Assets
-        uses: softprops/action-gh-release@v2
-        with:
-          files: installer/bin/Release/*.msi
-          fail_on_unmatched_files: true
-          draft: false
-          prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: pwsh
+        run: |
+          $msiPath = Get-ChildItem -Path "installer/bin/Release" -Filter "*.msi" -Recurse | Select-Object -First 1
+          if (-not $msiPath) {
+            Write-Error "No MSI file found!"
+            exit 1
+          }
+          
+          $tagName = "${{ github.event.release.tag_name }}"
+          Write-Host "Uploading $($msiPath.Name) to release $tagName..."
+          
+          # Upload the asset using GitHub CLI
+          gh release upload "$tagName" "$($msiPath.FullName)" --clobber
+          
+          if ($LASTEXITCODE -eq 0) {
+            Write-Host "✅ Successfully uploaded Phat.msi to release $tagName"
+          } else {
+            Write-Error "Failed to upload asset"
+            exit 1
+          }
 
       - name: Verify Release
         shell: pwsh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          $tagName = "${{ github.event.release.tag_name }}"
           Write-Host "✅ Release workflow completed successfully"
-          Write-Host "📦 MSI uploaded to v1.2.0 release"
+          Write-Host "📦 MSI uploaded to $tagName release"
