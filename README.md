@@ -2,6 +2,8 @@
 
 A simple yet powerful CLI tool to manage multiple PHP versions in XAMPP on Windows.
 
+[![Release](https://github.com/pphatdev/php-version-switcher/actions/workflows/release.yml/badge.svg)](https://github.com/pphatdev/php-version-switcher/actions/workflows/release.yml)
+
 ## Features
 
 - 🔄 Switch between PHP versions instantly
