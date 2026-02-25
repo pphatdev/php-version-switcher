@@ -252,5 +252,5 @@ MIT © [pphatdev](https://github.com/pphatdev)
 
 ---
 
-**Made with ❤️ by [pphatdev](https://github.com/pphatdev)**
+**Made with 😧 to resolve PHP version switching issues | [pphatdev](https://github.com/pphatdev)**
 
