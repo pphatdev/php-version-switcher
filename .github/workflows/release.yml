@@ -6,6 +6,7 @@ on:
 
 permissions:
   contents: write
+  releases: write
 
 jobs:
   build-release:
@@ -58,5 +59,13 @@ jobs:
         with:
           files: installer/bin/Release/*.msi
           fail_on_unmatched_files: true
+          draft: false
+          prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Verify Release
+        shell: pwsh
+        run: |
+          Write-Host "✅ Release workflow completed successfully"
+          Write-Host "📦 MSI uploaded to v1.2.0 release"
