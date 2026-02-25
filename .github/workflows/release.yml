@@ -53,9 +53,10 @@ jobs:
             Get-ChildItem -Path "installer/bin/Release" -Recurse | ForEach-Object { Write-Host $_.FullName }
           }
 
-      - name: Create Release
+      - name: Upload Release Assets
         uses: softprops/action-gh-release@v2
         with:
           files: installer/bin/Release/*.msi
+          fail_on_unmatched_files: true
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
