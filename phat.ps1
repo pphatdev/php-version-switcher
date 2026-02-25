@@ -46,6 +46,58 @@ function Get-ApacheModuleName ([int]$Major) {
     }
 }
 
+function Get-InstalledPhatVersion {
+    $displayName = "Phat - XAMPP PHP Version Switcher"
+    $uninstallKeys = @(
+        "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*",
+        "HKLM:\Software\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*",
+        "HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*"
+    )
+
+    foreach ($keyPath in $uninstallKeys) {
+        try {
+            $entries = Get-ItemProperty -Path $keyPath -ErrorAction SilentlyContinue
+            foreach ($entry in $entries) {
+                if ($entry.DisplayName -eq $displayName -and $entry.DisplayVersion) {
+                    return $entry.DisplayVersion
+                }
+            }
+        }
+        catch {
+            continue
+        }
+    }
+
+    return $null
+}
+
+function Get-RepoPhatVersion {
+    $scriptDir = $PSScriptRoot
+    if (-not $scriptDir) {
+        $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+    }
+    if (-not $scriptDir) {
+        return $null
+    }
+
+    $versionFile = Join-Path $scriptDir "VERSION"
+    if (-not (Test-Path $versionFile)) {
+        return $null
+    }
+
+    try {
+        $content = (Get-Content -Path $versionFile -ErrorAction Stop | Select-Object -First 1).Trim()
+        if ($content) {
+            return $content
+        }
+    }
+    catch {
+        return $null
+    }
+
+    return $null
+}
+
 function Stop-ApacheService {
     $stopBat = Join-Path $XAMPP_ROOT "apache_stop.bat"
     if (Test-Path $stopBat) {
@@ -139,8 +191,11 @@ function Show-CurrentVersion {
 }
 
 function Show-Version {
+    $installedVersion = Get-InstalledPhatVersion
+    $repoVersion = Get-RepoPhatVersion
+    $version = if ($installedVersion) { $installedVersion } elseif ($repoVersion) { $repoVersion } else { $PHAT_VERSION }
     Write-Host ""
-    Write-Host "  Phat v$PHAT_VERSION" -ForegroundColor Cyan
+    Write-Host "  Phat v$version" -ForegroundColor Cyan
     Write-Host "  XAMPP PHP Version Switcher" -ForegroundColor Gray
     Write-Host ""
 }

@@ -152,20 +152,6 @@ Shows all available commands with examples.
 | **Backup**        | A backup of `httpd-xampp.conf.bak` is created on first switch.                                 |
 | **Services**      | Apache is automatically stopped before switching and restarted after configuration updates.    |
 
-## Project Structure
-
-```
-php-version-switcher/
-├── phat.bat                # Entry point (calls phat.ps1)
-├── phat.ps1                # Core logic (PowerShell)
-├── README.md               # Documentation
-├── dotnet-tools.json       # .NET tools configuration
-└── installer/              # MSI installer project
-    ├── Phat.wixproj        # WiX project file
-    ├── Phat.wxs            # WiX source file
-    └── assets/             # Installer assets
-```
-
 ## Requirements
 
 - **Windows 10/11** - Required for PowerShell support
