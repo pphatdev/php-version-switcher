@@ -8,7 +8,8 @@ A simple yet powerful CLI tool to manage multiple PHP versions in XAMPP on Windo
 
 - 🔄 Switch between PHP versions instantly
 - 📦 Download and install new PHP versions automatically
-- 📋 List all installed PHP versions (local)
+- �️ Uninstall PHP versions safely
+- �📋 List all installed PHP versions (local)
 - 🌐 Fetch available stable PHP versions from PHP.net (global)
 - ⚡ Automatic Apache configuration updates
 - 🛡️ Safe backups before switching
@@ -135,6 +136,20 @@ After installing, switch to it:
 ```bash
 phat switch 8.3.6
 ```
+
+### Uninstall a PHP version
+
+```bash
+phat uninstall 8.0.30
+```
+
+Removes an installed PHP version from your system. This will:
+
+1. Verify the version exists and is not currently active
+2. Ask for confirmation before deletion
+3. Permanently remove the PHP version directory
+
+**Note:** You cannot uninstall the currently active PHP version. Switch to a different version first.
 
 ### Help
 

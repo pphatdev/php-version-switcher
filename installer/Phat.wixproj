@@ -1,12 +1,19 @@
 <Project Sdk="WixToolset.Sdk/4.0.4">
   <PropertyGroup>
     <OutputType>Package</OutputType>
-    <OutputName>Phat</OutputName>
     <ProductVersion Condition="'$(ProductVersion)' == ''">1.0.0</ProductVersion>
+    <OutputName>phat-v$(ProductVersion)</OutputName>
     <DefineConstants>ProductVersion=$(ProductVersion)</DefineConstants>
     <!-- Security and Trust Settings -->
     <InstallerVersion>500</InstallerVersion>
     <Cultures>en-us</Cultures>
   </PropertyGroup>
+
+  <Target Name="DisplayVersion" BeforeTargets="Build">
+    <Message Text="========================================" Importance="high" />
+    <Message Text="Building MSI with version: $(ProductVersion)" Importance="high" />
+    <Message Text="Output: $(OutputName).msi" Importance="high" />
+    <Message Text="========================================" Importance="high" />
+  </Target>
 
 </Project>

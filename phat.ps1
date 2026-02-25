@@ -214,11 +214,11 @@ function Write-UsageLine ([string]$CommandText, [string]$Description) {
 
 function Show-Help {
     Write-Host ""
-    Write-Host "      ____  __          __ " -ForegroundColor Cyan
-    Write-Host "     / __ \/ /_  ____ _/ /_" -ForegroundColor Cyan
-    Write-Host "    / /_/ / __ \/ __ `/ __/" -ForegroundColor Cyan
-    Write-Host "   / ____/ / / / /_/ / /_  " -ForegroundColor Cyan
-    Write-Host "  /_/   /_/ /_/\__,_/\__/  " -ForegroundColor Cyan
+    Write-Host "      ____  __          __  " -ForegroundColor Cyan
+    Write-Host "     / __ \/ /_  ____ _/ /_ " -ForegroundColor Cyan
+    Write-Host "    / /_/ / __ \/ __ `/ __/ " -ForegroundColor Cyan
+    Write-Host "   / ____/ / / / /_/ / /_   " -ForegroundColor Cyan
+    Write-Host "  /_/   /_/ /_/\__,_/\__/   " -ForegroundColor Cyan
     Write-Host ""
     Write-Host "  Phat - My Personal XAMPP PHP Version Switcher " -ForegroundColor Gray
     Write-Host "  Github: @pphatdev" -ForegroundColor Gray
@@ -232,12 +232,14 @@ function Show-Help {
     Write-UsageLine "phat switch [version]" "          -> Switch to a PHP version"
     Write-UsageLine "phat use [version]" "             -> Alias for switch"
     Write-UsageLine "phat install [version]" "         -> Download and install a PHP version"
+    Write-UsageLine "phat uninstall [version]" "       -> Remove an installed PHP version"
     Write-UsageLine "phat help" "                      -> Show this help"
     Write-Host ""
     Write-Host "  Examples:"
     Write-ExampleLine "phat list --php --global"
     Write-ExampleLine "phat switch 7.4.33"
     Write-ExampleLine "phat install 8.2.27"
+    Write-ExampleLine "phat uninstall 7.4.33"
     Write-Host ""
 }
 
@@ -530,6 +532,67 @@ function Invoke-Install ([string]$Version) {
     Write-Host ""
 }
 
+function Invoke-Uninstall ([string]$Version) {
+    if (-not $Version) {
+        Write-Host "  Error: Version required. Usage: phat uninstall [version]" -ForegroundColor Red
+        Write-Host "  Example: phat uninstall 8.2.27" -ForegroundColor Gray
+        return
+    }
+
+    $targetDir = Join-Path $XAMPP_ROOT "php$Version"
+    $currentDir = Join-Path $XAMPP_ROOT "php"
+
+    # Validate target exists
+    if (-not (Test-Path $targetDir)) {
+        Write-Host "  Error: php$Version is not installed in $XAMPP_ROOT" -ForegroundColor Red
+        Write-Host "  Available:" -ForegroundColor Gray
+        Get-ChildItem -Path $XAMPP_ROOT -Directory -Filter "php*" |
+            Where-Object { $_.Name -ne "php" -and $_.Name -ne "phpMyAdmin" } |
+            ForEach-Object { Write-Host "    $($_.Name -replace '^php', '')" }
+        return
+    }
+
+    # Check if trying to uninstall the active version
+    $currentVer = Get-PhpVersion $currentDir
+    $targetVer = Get-PhpVersion $targetDir
+    
+    if ($currentVer -and $targetVer -and ($currentVer -eq $targetVer)) {
+        Write-Host "  Error: Cannot uninstall the currently active PHP version ($Version)" -ForegroundColor Red
+        Write-Host "  Please switch to another version first." -ForegroundColor Yellow
+        return
+    }
+
+    Write-Host ""
+    Write-Host "  Uninstalling PHP $Version..." -ForegroundColor Cyan
+    Write-Host ""
+
+    # Confirmation prompt
+    Write-Host "  This will permanently delete: $targetDir" -ForegroundColor Yellow
+    $confirmation = Read-Host "  Type 'yes' to confirm"
+    
+    if ($confirmation -ne 'yes') {
+        Write-Host ""
+        Write-Host "  Uninstall cancelled." -ForegroundColor Gray
+        Write-Host ""
+        return
+    }
+
+    # Remove the directory
+    try {
+        Write-Host ""
+        Write-Host "  Removing PHP $Version..." -ForegroundColor White
+        Remove-Item -Path $targetDir -Recurse -Force -ErrorAction Stop
+        Write-Host ""
+        Write-Host "  Done! PHP $Version has been uninstalled." -ForegroundColor Green
+        Write-Host ""
+    }
+    catch {
+        Write-Host ""
+        Write-Host "  Error: Failed to remove PHP $Version - $_" -ForegroundColor Red
+        Write-Host ""
+    }
+}
+
 # ── Dispatch ───────────────────────────────────────────────────────────────────
 
 if ($VersionFlag) {
@@ -543,6 +606,7 @@ switch ($Command) {
     "switch"     { Invoke-Switch $Argument }
     "use"        { Invoke-Switch $Argument }
     "install"    { Invoke-Install $Argument }
+    "uninstall"  { Invoke-Uninstall $Argument }
     "help"       { Show-Help }
     
     default      { Show-Help }

@@ -36,7 +36,7 @@ jobs:
             exit $LASTEXITCODE
           }
 
-      - name: Debug - List built files
+      - name: Verify Build Output
         shell: pwsh
         run: |
           Write-Host "=== Looking for output files ==="
@@ -51,7 +51,23 @@ jobs:
             Write-Host ""
             Write-Host "=== Directory contents ==="
             Get-ChildItem -Path "installer/bin/Release" -Recurse | ForEach-Object { Write-Host $_.FullName }
+            exit 1
           }
+
+      - name: Generate Checksum
+        shell: pwsh
+        run: |
+          $msiPath = Get-ChildItem -Path "installer/bin/Release" -Filter "*.msi" -Recurse | Select-Object -First 1
+          if (-not $msiPath) {
+            Write-Error "No MSI file found!"
+            exit 1
+          }
+
+          $hash = Get-FileHash -Path $msiPath.FullName -Algorithm SHA256
+          $checksumFile = "$($msiPath.DirectoryName)\$($msiPath.BaseName).sha256"
+          "$($hash.Hash)  $($msiPath.Name)" | Out-File -FilePath $checksumFile -Encoding UTF8
+          Write-Host "✅ Checksum generated: $($hash.Hash)"
+          Write-Host "📝 Checksum file: $checksumFile"
 
       - name: Code Sign MSI (Optional)
         shell: pwsh
@@ -71,24 +87,45 @@ jobs:
             exit 1
           }
 
+          $checksumPath = Get-ChildItem -Path "installer/bin/Release" -Filter "*.sha256" -Recurse | Select-Object -First 1
+
           $tagName = "${{ github.event.release.tag_name }}"
           Write-Host "Uploading $($msiPath.Name) to release $tagName..."
 
-          # Upload the asset using GitHub CLI
+          # Upload MSI file
           gh release upload "$tagName" "$($msiPath.FullName)" --clobber
-
-          if ($LASTEXITCODE -eq 0) {
-            Write-Host "✅ Successfully uploaded Phat.msi to release $tagName"
-          } else {
-            Write-Error "Failed to upload asset"
+          if ($LASTEXITCODE -ne 0) {
+            Write-Error "Failed to upload MSI file"
             exit 1
           }
+          Write-Host "✅ Successfully uploaded $($msiPath.Name)"
 
-      - name: Verify Release
+          # Upload checksum file
+          if ($checksumPath) {
+            gh release upload "$tagName" "$($checksumPath.FullName)" --clobber
+            if ($LASTEXITCODE -ne 0) {
+              Write-Error "Failed to upload checksum file"
+              exit 1
+            }
+            Write-Host "✅ Successfully uploaded $($checksumPath.Name)"
+          }
+
+      - name: Summary
         shell: pwsh
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           $tagName = "${{ github.event.release.tag_name }}"
+          $tagVersion = $tagName.TrimStart('v')
+          $version = $tagVersion -replace '-.*$', ''
+
+          Write-Host ""
+          Write-Host "═══════════════════════════════════════════════════════"
           Write-Host "✅ Release workflow completed successfully"
-          Write-Host "📦 MSI uploaded to $tagName release"
+          Write-Host "═══════════════════════════════════════════════════════"
+          Write-Host "📦 Package: Phat-v$version.msi"
+          Write-Host "🏷️  Release: $tagName"
+          Write-Host "🔐 SHA256 checksum included"
+          Write-Host "📝 Publisher: PPhatDEV"
+          Write-Host "═══════════════════════════════════════════════════════"
+          Write-Host ""

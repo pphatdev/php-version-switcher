@@ -10,17 +10,25 @@
         <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
         <MediaTemplate EmbedCab="yes" />
 
+        <!-- Publisher Information -->
+        <Property Id="ARPPRODUCTICON" Value="PhatIcon" />
+        <Property Id="ARPPUBLISHER" Value="PPhatDEV" />
+        <Property Id="ARPHELPLINK" Value="https://github.com/pphatdev/php-version-switcher" />
+        <Property Id="ARPURLINFOABOUT" Value="https://github.com/pphatdev/php-version-switcher" />
+        <Property Id="ARPCONTACT" Value="PPhatDEV" />
+
         <StandardDirectory Id="ProgramFilesFolder">
             <Directory Id="INSTALLFOLDER" Name="Phat">
                 <Component Id="PhatBatComponent" Guid="*">
                     <File Id="PhatBat" Source="..\phat.bat" KeyPath="yes" />
                     <Environment
                         Id="PhatPath"
-                        Name="Path"
+                        Name="PATH"
                         Value="[INSTALLFOLDER]"
                         Action="set"
                         Part="last"
-                        System="yes" />
+                        System="yes"
+                        Permanent="no" />
                 </Component>
                 <Component Id="PhatPs1Component" Guid="*">
                     <File Id="PhatPs1" Source="..\phat.ps1" KeyPath="yes" />
