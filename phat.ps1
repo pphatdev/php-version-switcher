@@ -3,10 +3,14 @@ param(
     [string]$Command = "help",
 
     [Parameter(Position = 1)]
-    [string]$Argument
+    [string]$Argument,
+
+    [Alias("v", "version")]
+    [switch]$VersionFlag
 )
 
 # Configuration
+$PHAT_VERSION = "1.0.0"
 $XAMPP_ROOT  = "C:\xampp"
 $APACHE_CONF = "$XAMPP_ROOT\apache\conf\extra\httpd-xampp.conf"
 $APACHE_BIN  = "$XAMPP_ROOT\apache\bin\httpd.exe"
@@ -107,21 +111,71 @@ function Update-ApacheConf ([int]$Major) {
     Write-Host "  Updated Apache config: module=$moduleName, dll=$apacheDllName" -ForegroundColor DarkGray
 }
 
+function Show-CurrentVersion {
+    $phpDir = Join-Path $XAMPP_ROOT "php"
+    if (-not (Test-Path $phpDir)) {
+        Write-Host "  ERROR: PHP directory not found at $phpDir" -ForegroundColor Red
+        return
+    }
+
+    $ver = Get-PhpVersion $phpDir
+    $major = Get-PhpMajor $phpDir
+
+    if ($ver) {
+        Write-Host ""
+        Write-Host "  Current PHP Version: " -ForegroundColor Cyan -NoNewline
+        Write-Host "$ver (PHP $major)" -ForegroundColor Green
+        Write-Host ""
+    }
+    else {
+        Write-Host ""
+        Write-Host "  ERROR: Unable to determine current PHP version" -ForegroundColor Red
+        Write-Host ""
+    }
+}
+
+function Show-Version {
+    Write-Host ""
+    Write-Host "  Phat v$PHAT_VERSION" -ForegroundColor Cyan
+    Write-Host "  XAMPP PHP Version Switcher" -ForegroundColor Gray
+    Write-Host ""
+}
+
+function Write-ExampleLine ([string]$CommandText) {
+    Write-Host "    $ " -ForegroundColor DarkGray -NoNewline
+    Write-Host $CommandText -ForegroundColor Cyan
+}
+
+function Write-UsageLine ([string]$CommandText, [string]$Description) {
+    Write-Host "    $CommandText" -ForegroundColor Cyan -NoNewline
+    Write-Host "  $Description" -ForegroundColor DarkGray
+}
+
 # ── Commands ───────────────────────────────────────────────────────────────────
 
 function Show-Help {
     Write-Host ""
-    Write-Host "  Phat - XAMPP PHP Version Switcher" -ForegroundColor Cyan
+    Write-Host "      ____  __          __ " -ForegroundColor Cyan
+    Write-Host "     / __ \/ /_  ____ _/ /_" -ForegroundColor Cyan
+    Write-Host "    / /_/ / __ \/ __ `/ __/" -ForegroundColor Cyan
+    Write-Host "   / ____/ / / / /_/ / /_  " -ForegroundColor Cyan
+    Write-Host "  /_/   /_/ /_/\__,_/\__/  " -ForegroundColor Cyan
+    Write-Host ""
+    Write-Host "  Phat - My Personal XAMPP PHP Version Switcher " -ForegroundColor Gray
+    Write-Host "  Github: @pphatdev" -ForegroundColor Gray
     Write-Host ""
     Write-Host "  Usage:"
-    Write-Host "    phat list                  List installed PHP versions"
-    Write-Host "    phat switch [version]      Switch to a PHP version"
-    Write-Host "    phat install [version]     Download and install a PHP version"
-    Write-Host "    phat help                  Show this help"
+    Write-UsageLine "phat list" "               -> List installed PHP versions"
+    Write-UsageLine "phat current" "            -> Show current PHP version"
+    Write-UsageLine "phat -v | --version" "     -> Show Phat version"
+    Write-UsageLine "phat switch [version]" "   -> Switch to a PHP version"
+    Write-UsageLine "phat use [version]" "      -> Alias for switch"
+    Write-UsageLine "phat install [version]" "  -> Download and install a PHP version"
+    Write-UsageLine "phat help" "               -> Show this help"
     Write-Host ""
     Write-Host "  Examples:"
-    Write-Host "    phat switch 7.4.33"
-    Write-Host "    phat install 8.2.27"
+    Write-ExampleLine "phat switch 7.4.33"
+    Write-ExampleLine "phat install 8.2.27"
     Write-Host ""
 }
 
@@ -344,10 +398,18 @@ function Invoke-Install ([string]$Version) {
 
 # ── Dispatch ───────────────────────────────────────────────────────────────────
 
+if ($VersionFlag) {
+    Show-Version
+    return
+}
+
 switch ($Command) {
-    "list"    { Invoke-List }
-    "switch"  { Invoke-Switch $Argument }
-    "install" { Invoke-Install $Argument }
-    "help"    { Show-Help }
-    default   { Show-Help }
+    "list"       { Invoke-List }
+    "current"    { Show-CurrentVersion }
+    "switch"     { Invoke-Switch $Argument }
+    "use"        { Invoke-Switch $Argument }
+    "install"    { Invoke-Install $Argument }
+    "help"       { Show-Help }
+    
+    default      { Show-Help }
 }

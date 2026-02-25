@@ -1,10 +1,24 @@
 # Phat - XAMPP PHP Version Switcher
 
-A CLI tool to manage multiple PHP versions in XAMPP on Windows.
+A simple yet powerful CLI tool to manage multiple PHP versions in XAMPP on Windows.
+
+## Features
+
+- 🔄 Switch between PHP versions instantly
+- 📦 Download and install new PHP versions automatically
+- 📋 List all installed PHP versions
+- ⚡ Automatic Apache configuration updates
+- 🛡️ Safe backups before switching
 
 ## Setup
 
-1. Clone or download from [GitHub](https://github.com/pphatdev/php-version-switcher/archive/refs/tags/v1.0.0.zip):
+### Option 1: Install from MSI (Recommended)
+
+Download the latest MSI installer from [Releases](https://github.com/pphatdev/php-version-switcher/releases) and run it. The installer will automatically add `phat` to your PATH.
+
+### Option 2: Manual Installation
+
+1. Clone or download from [GitHub](https://github.com/pphatdev/php-version-switcher):
 
    ```bash
    git clone https://github.com/pphatdev/php-version-switcher.git
@@ -17,11 +31,21 @@ A CLI tool to manage multiple PHP versions in XAMPP on Windows.
    Add the full path to where you cloned/extracted the files.
 
 3. Open a **new** terminal and run:
-   ```
+   ```bash
    phat help
    ```
 
 ## Commands
+
+### Show version
+
+```bash
+phat -v
+# or
+phat --version
+```
+
+Displays the current Phat version.
 
 ### List installed versions
 
@@ -29,7 +53,7 @@ A CLI tool to manage multiple PHP versions in XAMPP on Windows.
 phat list
 ```
 
-Output:
+Output example:
 
 ```
   Installed PHP versions:
@@ -38,17 +62,27 @@ Output:
     8.2.27 (8.2.27)
 ```
 
+### Show current version
+
+```bash
+phat current
+```
+
+Displays the currently active PHP version in XAMPP.
+
 ### Switch PHP version
 
 ```bash
 phat switch 8.0.30
+# or use the alias
+phat use 8.0.30
 ```
 
 This will:
 
 1. Stop Apache
-2. Backup current `php/` → `php7.4.33/`
-3. Rename `php8.0.30/` → `php/`
+2. Backup current `php/` → `php{version}/` (e.g., `php7.4.33/`)
+3. Rename `php{target}/` → `php/`
 4. Update Apache config (`httpd-xampp.conf`)
 5. Start Apache
 
@@ -72,47 +106,96 @@ phat switch 8.3.6
 phat help
 ```
 
-## How it works
+Shows all available commands with examples.
 
-| Step              | What happens                                                                                   |
+## How It Works
+
+| Component         | Description                                                                                    |
 | ----------------- | ---------------------------------------------------------------------------------------------- |
 | **Directories**   | PHP versions are stored as `C:\xampp\php{version}\`. The active one is always `C:\xampp\php\`. |
 | **Apache config** | `httpd-xampp.conf` is updated to load the correct `php7apache2_4.dll` or `php8apache2_4.dll`.  |
 | **Module name**   | PHP 7.x uses `php7_module`, PHP 8.x uses `php_module` (XAMPP convention).                      |
 | **Backup**        | A backup of `httpd-xampp.conf.bak` is created on first switch.                                 |
+| **Services**      | Apache is automatically stopped before switching and restarted after configuration updates.    |
 
-## File structure
+## Project Structure
 
 ```
 php-version-switcher/
-├── phat.bat          # Entry point (calls phat.ps1)
-├── phat.ps1          # Core logic (PowerShell)
-└── README.md
+├── phat.bat                # Entry point (calls phat.ps1)
+├── phat.ps1                # Core logic (PowerShell)
+├── README.md               # Documentation
+├── dotnet-tools.json       # .NET tools configuration
+└── installer/              # MSI installer project
+    ├── Phat.wixproj        # WiX project file
+    ├── Phat.wxs            # WiX source file
+    └── assets/             # Installer assets
 ```
 
 ## Requirements
 
-- Windows 10/11
-- XAMPP installed at `C:\xampp`
-- PowerShell 5.1+
-- .NET SDK 6.0+ (for MSI builds)
+- **Windows 10/11** - Required for PowerShell support
+- **XAMPP** - Installed at `C:\xampp` (default location)
+- **PowerShell 5.1+** - Pre-installed on Windows 10/11
+- **.NET SDK 6.0+** - Only needed for building the MSI installer
 
-## Build MSI (dotnet)
+## Building the MSI Installer
 
-From PowerShell:
+If you want to build the installer from source:
+
+1. Install the [.NET SDK 6.0+](https://dotnet.microsoft.com/download)
+
+2. Build the MSI:
+
+   ```powershell
+   dotnet build ./installer/Phat.wixproj -c Release
+   ```
+
+3. The MSI will be created in `installer\bin\Release\`
+
+To specify a custom version:
 
 ```powershell
-dotnet build .\installer\Phat.wixproj -c Release -p:ProductVersion=1.0.0
+dotnet build ./installer/Phat.wixproj -c Release -p:ProductVersion=1.0.0
 ```
 
-The MSI will be created in `installer\bin\Release`.
+## Troubleshooting
 
-## Notes
+### Permission Errors
 
-- Run from an **elevated terminal** (Run as Administrator) if you get permission errors during switching.
-- Apache vhost warnings (e.g. `Could not resolve host name`) are unrelated to PHP switching — they come from your virtual host configuration.
+Run your terminal as **Administrator** if you encounter permission errors when switching PHP versions.
+
+### Apache Won't Start
+
+1. Check Apache error logs at `C:\xampp\apache\logs\error.log`
+2. Ensure the correct PHP DLL files exist in the PHP directory
+3. Verify `httpd-xampp.conf` has the correct PHP module configuration
+
+### VHost Warnings
+
+Apache virtual host warnings (e.g., `Could not resolve host name`) are unrelated to PHP switching — they come from your virtual host configuration in `httpd-vhosts.conf`.
+
+## Contributing
+
+Contributions are welcome! Feel free to:
+
+- Report bugs and issues
+- Suggest new features
+- Submit pull requests
+
+## Support
+
+If you find this tool helpful, please consider:
+
+- ⭐ Starring the repository
+- 🐛 Reporting bugs
+- 📝 Improving documentation
 
 ## License
 
 MIT © [pphatdev](https://github.com/pphatdev)
+
+---
+
+**Made with ❤️ by [pphatdev](https://github.com/pphatdev)**
 
