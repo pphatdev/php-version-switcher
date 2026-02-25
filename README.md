@@ -87,8 +87,7 @@ phat help
 php-version-switcher/
 ├── phat.bat          # Entry point (calls phat.ps1)
 ├── phat.ps1          # Core logic (PowerShell)
-├── README.md
-└── PLAN.md
+└── README.md
 ```
 
 ## Requirements
