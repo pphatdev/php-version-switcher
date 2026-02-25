@@ -27,7 +27,22 @@ jobs:
         shell: pwsh
         run: |
           $version = "${{ github.event.release.tag_name }}".TrimStart('v')
+          Write-Host "Building with version: $version"
           dotnet build ./installer/Phat.wixproj -c Release -p:ProductVersion=$version
+
+      - name: Debug - List built files
+        shell: pwsh
+        run: |
+          Write-Host "=== Directory structure ==="
+          Get-ChildItem -Path "installer" -Recurse | Select-Object -Last 20 | ForEach-Object { Write-Host $_.FullName }
+          Write-Host ""
+          Write-Host "=== Looking for .msi files ==="
+          $msiFiles = Get-ChildItem -Path "." -Filter "*.msi" -Recurse
+          if ($msiFiles) {
+            $msiFiles | ForEach-Object { Write-Host "Found: $($_.FullName)" }
+          } else {
+            Write-Host "No .msi files found!"
+          }
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
