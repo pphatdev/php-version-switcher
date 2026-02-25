@@ -54,7 +54,6 @@ jobs:
           }
 
       - name: Code Sign MSI (Optional)
-        if: secrets.CODE_SIGNING_CERT != ''
         shell: pwsh
         run: |
           Write-Host "ℹ️  Code signing certificate not configured."

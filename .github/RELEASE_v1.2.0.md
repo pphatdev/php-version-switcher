@@ -1,6 +1,6 @@
 ## 🎉 What's New in v1.2.0
 
-This release improves the installer experience with a single-file MSI package.
+This release improves the installer with a single-file MSI package and enhanced security.
 
 ### 🔧 Improvements
 
@@ -9,8 +9,14 @@ This release improves the installer experience with a single-file MSI package.
 - ✅ No more missing file errors during installation
 - 📦 Easier distribution — One `.msi` file contains everything
 
+**Enhanced Security**
+- 🔒 Full trust installation — Installer runs with elevated privileges
+- 🛡️ Per-machine installation scope — Available to all users
+- 📝 Publisher verified — Shows "PPhatDEV" as the publisher
+- 🔐 Ready for code signing (optional)
+
 **Enhanced CI/CD Pipeline**
-- 🔨 Added WiX Toolset installation step for reliable builds
+- 🔨 Fixed WiX Toolset build configuration
 - ✅ Improved build error detection and reporting
 - 🐛 Better debug output for troubleshooting
 
