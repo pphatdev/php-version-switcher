@@ -7,7 +7,7 @@
         UpgradeCode="{3B4F2B7E-3A1C-4B24-9A88-7CF4E7C2C941}">
         <Icon Id="PhatIcon" SourceFile="assets\phat.ico" />
         <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
-        <MediaTemplate />
+        <MediaTemplate EmbedCab="yes" />
 
         <StandardDirectory Id="ProgramFilesFolder">
             <Directory Id="INSTALLFOLDER" Name="Phat">

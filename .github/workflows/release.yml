@@ -46,12 +46,14 @@ jobs:
         shell: pwsh
         run: |
           Write-Host "=== Looking for output files ==="
-          $msiFiles = Get-ChildItem -Path "installer/bin/Release" -Include "*.msi", "*.cab" -Recurse
+          $msiFiles = Get-ChildItem -Path "installer/bin/Release" -Filter "*.msi" -Recurse
           if ($msiFiles) {
-            Write-Host "Found files:"
-            $msiFiles | ForEach-Object { Write-Host "  - $($_.FullName)" }
+            Write-Host "Found MSI files:"
+            $msiFiles | ForEach-Object { 
+              Write-Host "  - $($_.FullName) ($([math]::Round($_.Length / 1KB, 2)) KB)"
+            }
           } else {
-            Write-Host "No .msi or .cab files found in installer/bin/Release!"
+            Write-Host "No .msi files found in installer/bin/Release!"
             Write-Host ""
             Write-Host "=== Directory contents ==="
             Get-ChildItem -Path "installer/bin/Release" -Recurse | ForEach-Object { Write-Host $_.FullName }
@@ -60,8 +62,6 @@ jobs:
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
-          files: |
-            installer/bin/Release/*.msi
-            installer/bin/Release/*.cab
+          files: installer/bin/Release/*.msi
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
