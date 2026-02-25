@@ -20,6 +20,12 @@ jobs:
         with:
           dotnet-version: "6.0.x"
 
+      - name: Install WiX Toolset
+        shell: pwsh
+        run: |
+          dotnet tool install --global WixToolset.Cli
+          wix extension add WixToolset.Ui.wixext/4.0.4
+
       - name: Restore
         run: dotnet restore ./installer/Phat.wixproj
 
@@ -31,19 +37,24 @@ jobs:
           $version = $tagVersion -replace '-.*$', ''
           Write-Host "Tag: $tagVersion -> MSI Version: $version"
           dotnet build ./installer/Phat.wixproj -c Release -p:ProductVersion=$version
+          if ($LASTEXITCODE -ne 0) {
+            Write-Error "Build failed with exit code $LASTEXITCODE"
+            exit $LASTEXITCODE
+          }
 
       - name: Debug - List built files
         shell: pwsh
         run: |
-          Write-Host "=== Directory structure ==="
-          Get-ChildItem -Path "installer" -Recurse | Select-Object -Last 20 | ForEach-Object { Write-Host $_.FullName }
-          Write-Host ""
-          Write-Host "=== Looking for .msi files ==="
-          $msiFiles = Get-ChildItem -Path "." -Filter "*.msi" -Recurse
+          Write-Host "=== Looking for output files ==="
+          $msiFiles = Get-ChildItem -Path "installer/bin/Release" -Include "*.msi", "*.cab" -Recurse
           if ($msiFiles) {
-            $msiFiles | ForEach-Object { Write-Host "Found: $($_.FullName)" }
+            Write-Host "Found files:"
+            $msiFiles | ForEach-Object { Write-Host "  - $($_.FullName)" }
           } else {
-            Write-Host "No .msi files found!"
+            Write-Host "No .msi or .cab files found in installer/bin/Release!"
+            Write-Host ""
+            Write-Host "=== Directory contents ==="
+            Get-ChildItem -Path "installer/bin/Release" -Recurse | ForEach-Object { Write-Host $_.FullName }
           }
 
       - name: Create Release
@@ -51,5 +62,6 @@ jobs:
         with:
           files: |
             installer/bin/Release/*.msi
+            installer/bin/Release/*.cab
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
