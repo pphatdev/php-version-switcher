@@ -200,6 +200,52 @@ function Show-Version {
     Write-Host ""
 }
 
+function Show-WhereAmI {
+    Write-Host ""
+    Write-Host "  Phat Installation Locations:" -ForegroundColor Cyan
+    Write-Host ""
+
+    # Find phat.bat in PATH
+    $phatBat = $null
+    $pathDirs = $env:PATH -split ';'
+    
+    foreach ($dir in $pathDirs) {
+        if ($dir -and (Test-Path $dir)) {
+            $batPath = Join-Path $dir "phat.bat"
+            if (Test-Path $batPath) {
+                $phatBat = $batPath
+                break
+            }
+        }
+    }
+
+    # Show phat.bat location
+    if ($phatBat) {
+        Write-Host "  phat.bat:" -ForegroundColor Green
+        Write-Host "    $phatBat" -ForegroundColor White
+    } else {
+        Write-Host "  phat.bat: " -NoNewline -ForegroundColor Yellow
+        Write-Host "Not found in PATH" -ForegroundColor Gray
+    }
+
+    # Show current script location
+    $scriptPath = $PSScriptRoot
+    if (-not $scriptPath) {
+        $scriptPath = Split-Path -Parent $MyInvocation.MyCommand.Path
+    }
+    
+    if ($scriptPath) {
+        $ps1Path = Join-Path $scriptPath "phat.ps1"
+        if (Test-Path $ps1Path) {
+            Write-Host ""
+            Write-Host "  phat.ps1:" -ForegroundColor Green
+            Write-Host "    $ps1Path" -ForegroundColor White
+        }
+    }
+
+    Write-Host ""
+}
+
 function Write-ExampleLine ([string]$CommandText) {
     Write-Host "    $ " -ForegroundColor DarkGray -NoNewline
     Write-Host $CommandText -ForegroundColor Cyan
@@ -228,6 +274,7 @@ function Show-Help {
     Write-UsageLine "phat list --php --local" "        -> List local PHP versions (same as list)"
     Write-UsageLine "phat list --php --global" "       -> List available stable versions from PHP.net"
     Write-UsageLine "phat current" "                   -> Show current PHP version"
+    Write-UsageLine "phat whereami" "                  -> Show phat.bat installation location"
     Write-UsageLine "phat -v | --version" "            -> Show Phat version"
     Write-UsageLine "phat switch [version]" "          -> Switch to a PHP version"
     Write-UsageLine "phat use [version]" "             -> Alias for switch"
@@ -603,11 +650,11 @@ if ($VersionFlag) {
 switch ($Command) {
     "list"       { Invoke-List }
     "current"    { Show-CurrentVersion }
+    "whereami"   { Show-WhereAmI }
     "switch"     { Invoke-Switch $Argument }
     "use"        { Invoke-Switch $Argument }
     "install"    { Invoke-Install $Argument }
     "uninstall"  { Invoke-Uninstall $Argument }
     "help"       { Show-Help }
-    
     default      { Show-Help }
 }

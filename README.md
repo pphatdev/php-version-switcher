@@ -39,6 +39,8 @@ Download the latest MSI installer from [Releases](https://github.com/pphatdev/ph
    phat help
    ```
 
+> **Note**: Phat is designed for Windows Command Prompt or PowerShell. If using Git Bash or other bash terminals, see the [Git Bash compatibility guide](docs/git-bash-compatibility.md).
+
 ## Commands
 
 ### Show version
@@ -198,15 +200,31 @@ dotnet build ./installer/Phat.wixproj -c Release -p:ProductVersion=1.0.0
 
 ## Troubleshooting
 
+📖 **For detailed troubleshooting solutions, see [TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md)**
+
+### PowerShell Execution Policy Error
+
+If you see "cannot be loaded. The file is not digitally signed" error:
+
+1. Open PowerShell as Administrator
+2. Run: `Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser`
+3. Run: `Unblock-File "C:\Program Files (x86)\Phat\phat.ps1"`
+
+➡️ **[Full solution guide](docs/powershell-execution-policy.md)**
+
 ### Permission Errors
 
 Run your terminal as **Administrator** if you encounter permission errors when switching PHP versions.
+
+➡️ **[Full solution guide](docs/permission-denied.md)**
 
 ### Apache Won't Start
 
 1. Check Apache error logs at `C:\xampp\apache\logs\error.log`
 2. Ensure the correct PHP DLL files exist in the PHP directory
 3. Verify `httpd-xampp.conf` has the correct PHP module configuration
+
+➡️ **[Full solution guide](docs/apache-wont-start.md)**
 
 ### VHost Warnings
 
