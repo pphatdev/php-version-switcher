@@ -20,12 +20,6 @@ jobs:
         with:
           dotnet-version: "6.0.x"
 
-      - name: Install WiX Toolset
-        shell: pwsh
-        run: |
-          dotnet tool install --global WixToolset.Cli
-          wix extension add WixToolset.Ui.wixext/4.0.4
-
       - name: Restore
         run: dotnet restore ./installer/Phat.wixproj
 
